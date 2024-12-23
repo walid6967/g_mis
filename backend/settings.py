@@ -41,7 +41,8 @@ INSTALLED_APPS = [
     'rest_framework.authtoken',
     'supplier',
     'inventory',
-    'account'
+    'account',
+    'custom_auth',
 
 ]
 
