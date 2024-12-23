@@ -71,7 +71,7 @@ def supplier_update(request, pk):
 @permission_classes([IsAuthenticated])
 def supplier_delete(request, pk):
     try:
-        supplier = Supplier.objects.get(pk=pk)
+        supplier = Supplier.objects.get(pk=pk, is_deleted=False)
         supplier.is_deleted=True
         supplier.save()
         return Response({"message": "Supplier deleted successfully"}, status=status.HTTP_204_NO_CONTENT)
