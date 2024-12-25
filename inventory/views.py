@@ -6,7 +6,7 @@ from .models import Inventory
 from .serializers import InventorySerializer
 
 @api_view(['GET'])
-# @permission_classes([IsAuthenticated])
+@permission_classes([IsAuthenticated])
 def inventories(request):
     try:
         name = request.query_params.get('name', None)
@@ -29,7 +29,7 @@ def inventories(request):
         return Response({"error": str(e)}, status=status.HTTP_400_BAD_REQUEST)
 
 @api_view(['GET'])
-# @permission_classes([IsAuthenticated])
+@permission_classes([IsAuthenticated])
 def get_inventory(request, id):
     try:
         inventory = Inventory.objects.get(pk=id,is_deleted=False)
@@ -41,7 +41,7 @@ def get_inventory(request, id):
         return Response({"error": str(e)}, status=status.HTTP_400_BAD_REQUEST)
 
 @api_view(['POST'])
-# @permission_classes([IsAuthenticated])
+@permission_classes([IsAuthenticated])
 def create_inventory(request):
     try:
         serializer = InventorySerializer(data=request.data)
@@ -53,7 +53,7 @@ def create_inventory(request):
         return Response({"error": str(e)}, status=status.HTTP_400_BAD_REQUEST)
 
 @api_view(['PUT'])
-# @permission_classes([IsAuthenticated])
+@permission_classes([IsAuthenticated])
 def update_inventory(request, id):
     try:
         inventory = Inventory.objects.get(pk=id, is_deleted=False)
@@ -68,7 +68,7 @@ def update_inventory(request, id):
         return Response({"error": str(e)}, status=status.HTTP_400_BAD_REQUEST)
 
 @api_view(['DELETE'])
-# @permission_classes([IsAuthenticated])
+@permission_classes([IsAuthenticated])
 def delete_inventory(request, id):
     try:
         inventory = Inventory.objects.get(pk=id)
