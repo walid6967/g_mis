@@ -58,28 +58,35 @@ def create_transaction(request):
         inventory = Inventory.objects.get(id=inv_id, is_deleted=False)
         supplier = Supplier.objects.get(id=supplier_id, is_deleted=False)
         account = Account.objects.get(id=supplier.account.pk)
-        
-        # Calculate transaction amount
         trans_amount = int(quantity) * inventory.price
         
-        # Deduct amount from user's account balance
-        if account.balance < trans_amount:
-            return Response(
-                {"error": "Insufficient balance in account."},
-                status=status.HTTP_400_BAD_REQUEST
-            )
-        
-        # Deduct stock and balance
-        account.balance -= trans_amount
-        account.save()
+        # Transaction based on balance account or cash
+        if account.balance > 0:
+            if account.balance >= trans_amount:
+                account.balance -= trans_amount
+                account.save()
+                transaction_message = f"Transaction done through balance account: `{account.title}. remaining balance: {account.balance}"
+            else:
+                partial_payment = account.balance
+                account.balance = 0
+                account.save()
+                remaining_amount = trans_amount - partial_payment
+                transaction_message = (
+                    f"The {partial_payment} deducted from balance account."
+                    f"But {remaining_amount} should be paid through cash."
+                )
+        else:
+            transaction_message = f"Cash transaction created. Payable amount: {trans_amount}"
 
         # Validate and save transaction
         if serializer.is_valid():
             serializer.save()
-            return Response(serializer.data, status=status.HTTP_201_CREATED)
+            return Response(
+                {"message": transaction_message, "transaction": serializer.data},
+                status=status.HTTP_201_CREATED
+            )
         
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
-    
     except Inventory.DoesNotExist:
         return Response({"error": "Inventory item does not exist or is deleted."}, status=status.HTTP_404_NOT_FOUND)
     except Supplier.DoesNotExist:
