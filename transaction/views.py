@@ -65,24 +65,24 @@ def create_transaction(request):
             if account.balance >= trans_amount:
                 account.balance -= trans_amount
                 account.save()
-                transaction_message = f"Transaction done through balance account: `{account.title}. remaining balance: {account.balance}"
+                trans_message = f"Transaction done through balance: `{account.title}`. remaining balance: `{account.balance}`"
             else:
                 partial_payment = account.balance
                 account.balance = 0
                 account.save()
                 remaining_amount = trans_amount - partial_payment
-                transaction_message = (
-                    f"The {partial_payment} deducted from balance account."
-                    f"But {remaining_amount} should be paid through cash."
+                trans_message = (
+                    f"The `{partial_payment}` deducted from balance `{account.title}`."
+                    f"But `{remaining_amount}` should be paid through cash."
                 )
         else:
-            transaction_message = f"Cash transaction created. Payable amount: {trans_amount}"
+            trans_message = f"Cash transaction created. Amount payable: `{trans_amount}`"
 
         # Validate and save transaction
         if serializer.is_valid():
             serializer.save()
             return Response(
-                {"message": transaction_message, "transaction": serializer.data},
+                {"message": trans_message, "transaction": serializer.data},
                 status=status.HTTP_201_CREATED
             )
         
